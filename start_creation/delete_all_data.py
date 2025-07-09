@@ -1,4 +1,3 @@
-import tarantool
 from connection import Connection
 
 conn = Connection()
