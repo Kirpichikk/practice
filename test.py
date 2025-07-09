@@ -20,7 +20,7 @@ result = conn.eval(f"""
     """
 )
 '''
-
+'''
 result = conn.insert('users', (None,
         'session_12345',
         '250011223344550',
@@ -31,3 +31,10 @@ result = conn.insert('users', (None,
         '00-11-22-33-44-55'))
 
 print("Вставленная запись:", result)
+
+'''
+
+space = conn.space("users")
+result = space.select()
+
+print(result)
