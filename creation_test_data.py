@@ -44,7 +44,7 @@ def get_data(data):
             return False
 
 # Пример использования
-def creation_data():
+def creation_data(pack = False):
     file_path = [r"D:\downloads\CCR-U_p0_v0.json",r"D:\downloads\CCR-U_p0_v1.json",r"D:\downloads\CCR-U_p0_v2.json"]
     result_AVP = []
     final_result = []
@@ -64,7 +64,7 @@ def creation_data():
             pre_final.insert(-1, None)
             pre_final.append(None)
             pre_final.append(pre_final[0])
-            #pre_final.insert(0, None)
+            if pack == True: pre_final.insert(0, None)
 
             final_result.append(tuple(pre_final))
 

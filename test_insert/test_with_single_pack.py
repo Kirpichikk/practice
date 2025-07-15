@@ -3,7 +3,7 @@ from connection import Connection
 from creation_test_data import creation_data
 
 conn = Connection()
-data = creation_data()
+data = creation_data(True)
 start = time.time()
 
 for i in data:
