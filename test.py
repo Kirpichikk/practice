@@ -35,6 +35,8 @@ print("Вставленная запись:", result)
 '''
 
 space = conn.space("users")
-result = space.select()
+#result = space.select(index = "primary")
+#result = conn.call('select_rows', ('users', ['Id','Session_Id','IMSI'], {'limit': 10}))
+#result = conn.call('select_with_value', ('users','Session_Id_index','session_12345', {'limit': 2, 'iterator':'GT'}))
 
-print(result)
+#print(result)
