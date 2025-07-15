@@ -1,7 +1,8 @@
 import asyncio
 import logging
 import time
-from asynctnt import Connection  # Асинхронный клиент для Tarantool
+from creation_test_data import creation_data
+from asynctnt import Connection
 
 # Настройка логирования
 logging.basicConfig(
@@ -22,22 +23,22 @@ async def create_connection():
         return None
 
 
-async def insert_job(conn, task_id, records_per_task):
-    """Асинхронная вставка данных"""
+async def insert_job(conn, task_id, records_per_task, data_set):
+    """Асинхронная вставка данных с использованием готового набора данных"""
     start_id = task_id * records_per_task
+    data_size = len(data_set)
+
     for i in range(records_per_task):
         record_id = start_id + i
+        # Циклический выбор данных из набора
+        data_index = record_id % data_size
+        record_data = data_set[data_index]
+
         try:
+            # Вставляем данные с автоматически сгенерированным ID
             await conn.insert(
                 "users",
-                (record_id,
-                 'session_12345',
-                 '250011223344550',
-                 '+79123456789',
-                 'user@domain.com',
-                 ['192.168.1.100', '10.0.0.1'],  # Используем списки вместо кортежей
-                 ['2001:db8::/64', '2001:db8:1::/64'],
-                 '00-11-22-33-44-55')
+                (record_id, *record_data)
             )
         except Exception as e:
             logger.error(f"Ошибка вставки записи {record_id}: {e}")
@@ -48,6 +49,15 @@ async def main():
     # Подключение к Tarantool
     conn = await create_connection()
     if not conn:
+        return
+
+    # Получаем тестовые данные
+    try:
+        test_data = creation_data()
+        logger.info(f"Получено {len(test_data)} записей тестовых данных")
+    except Exception as e:
+        logger.error(f"Ошибка получения тестовых данных: {e}")
+        await conn.disconnect()
         return
 
     # Параметры теста
@@ -64,12 +74,15 @@ async def main():
 
     # Создаем задачи
     tasks = []
+    start_time = time.monotonic()
+
     for task_id in range(num_tasks):
-        task = asyncio.create_task(insert_job(conn, task_id, records_per_task))
+        task = asyncio.create_task(
+            insert_job(conn, task_id, records_per_task, test_data)
+        )
         tasks.append(task)
 
-    # Замер времени выполнения
-    start_time = time.monotonic()
+    # Ожидаем завершения всех задач
     await asyncio.gather(*tasks)
     end_time = time.monotonic()
 
@@ -78,10 +91,10 @@ async def main():
 
     # Выводим результаты
     elapsed = end_time - start_time
-    print(f"\nРезультаты:")
-    print(f"Всего записей: {total_records}")
-    print(f"Общее время: {elapsed:.2f} секунд")
-    print(f"Скорость вставки: {total_records / elapsed:.2f} записей/сек")
+    logger.info("\nРезультаты:")
+    logger.info(f"Всего записей: {total_records}")
+    logger.info(f"Общее время: {elapsed:.2f} секунд")
+    logger.info(f"Скорость вставки: {total_records / elapsed:.2f} записей/сек")
 
 
 if __name__ == "__main__":
