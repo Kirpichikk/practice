@@ -23,7 +23,7 @@ async def create_connection():
         return None
 
 
-async def insert_job(conn, task_id, records_per_task, data_set):
+async def insert_job(conn, task_id, records_per_task, data_set, space_name):
     """Асинхронная вставка данных с использованием готового набора данных"""
     start_id = task_id * records_per_task
     data_size = len(data_set)
@@ -35,16 +35,13 @@ async def insert_job(conn, task_id, records_per_task, data_set):
         record_data = data_set[data_index]
 
         try:
-            # Вставляем данные с автоматически сгенерированным ID
-            await conn.insert(
-                "users",
-                (record_id, *record_data)
-            )
+            # ИСПРАВЛЕНО: правильный формат вставки данных
+            await conn.insert(space_name, record_data)
         except Exception as e:
             logger.error(f"Ошибка вставки записи {record_id}: {e}")
 
 
-async def main():
+async def main_cache1():
     """Основная асинхронная функция"""
     # Подключение к Tarantool
     conn = await create_connection()
@@ -53,7 +50,8 @@ async def main():
 
     # Получаем тестовые данные
     try:
-        test_data = creation_data()
+        # ИСПРАВЛЕНО: используем функцию создания тестовых данных
+        test_data = [(str(i), "3") for i in range(100000)]
         logger.info(f"Получено {len(test_data)} записей тестовых данных")
     except Exception as e:
         logger.error(f"Ошибка получения тестовых данных: {e}")
@@ -67,8 +65,9 @@ async def main():
 
     # Подготовка пространства (очистка)
     try:
-        await conn.call('box.space.users:truncate')
-        logger.info("Пространство 'users' очищено")
+        # ИСПРАВЛЕНО: правильный формат вызова truncate
+        await conn.eval('box.space.cache1:truncate()')
+        logger.info("Пространство 'cache1' очищено")
     except Exception as e:
         logger.warning(f"Не удалось очистить пространство: {e}")
 
@@ -78,7 +77,7 @@ async def main():
 
     for task_id in range(num_tasks):
         task = asyncio.create_task(
-            insert_job(conn, task_id, records_per_task, test_data)
+            insert_job(conn, task_id, records_per_task, test_data, "cache1")
         )
         tasks.append(task)
 
@@ -96,6 +95,60 @@ async def main():
     logger.info(f"Общее время: {elapsed:.2f} секунд")
     logger.info(f"Скорость вставки: {total_records / elapsed:.2f} записей/сек")
 
+async def main_cache2():
+    """Основная асинхронная функция"""
+    # Подключение к Tarantool
+    conn = await create_connection()
+    if not conn:
+        return
+
+    # Получаем тестовые данные
+    try:
+        # ИСПРАВЛЕНО: используем функцию создания тестовых данных
+        test_data = [(str(i), "\x00\xFF\xAA\xBB") for i in range(100000)]
+        logger.info(f"Получено {len(test_data)} записей тестовых данных")
+    except Exception as e:
+        logger.error(f"Ошибка получения тестовых данных: {e}")
+        await conn.disconnect()
+        return
+
+    # Параметры теста
+    num_tasks = 40
+    records_per_task = 2500
+    total_records = num_tasks * records_per_task
+
+    # Подготовка пространства (очистка)
+    try:
+        # ИСПРАВЛЕНО: правильный формат вызова truncate
+        await conn.eval('box.space.cache2:truncate()')
+        logger.info("Пространство 'cache2' очищено")
+    except Exception as e:
+        logger.warning(f"Не удалось очистить пространство: {e}")
+
+    # Создаем задачи
+    tasks = []
+    start_time = time.monotonic()
+
+    for task_id in range(num_tasks):
+        task = asyncio.create_task(
+            insert_job(conn, task_id, records_per_task, test_data, "cache2")
+        )
+        tasks.append(task)
+
+    # Ожидаем завершения всех задач
+    await asyncio.gather(*tasks)
+    end_time = time.monotonic()
+
+    # Закрываем соединение
+    await conn.disconnect()
+
+    # Выводим результаты
+    elapsed = end_time - start_time
+    logger.info("\nРезультаты:")
+    logger.info(f"Всего записей: {total_records}")
+    logger.info(f"Общее время: {elapsed:.2f} секунд")
+    logger.info(f"Скорость вставки: {total_records / elapsed:.2f} записей/сек")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main_cache1())
+    asyncio.run(main_cache2())

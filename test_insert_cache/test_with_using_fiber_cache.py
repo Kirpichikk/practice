@@ -4,7 +4,8 @@ from creation_test_data import creation_data
 
 conn = Connection()
 
-data = creation_data()
+data1 = [(str(i), "3") for i in range(100000)]
+data2 = [(str(i), "\x00\xFF\xAA\xBB") for i in range(100000)]
 batch_size = 2500
 
 def chunks(lst, n):
@@ -13,11 +14,22 @@ def chunks(lst, n):
 
 start = time.time()
 
-for batch in chunks(data, batch_size):
-    result = conn.call('insert_batch', (batch,))
+for batch in chunks(data1, batch_size):
+    result = conn.call('insert_batch_cache1', (batch,))
 
 conn.call('wait_completion')
 
 end = time.time() - start
 
-print(f"время вставки:{end}, скорость:{100000/end}")
+print(f"время вставки в cache1:{end}, скорость:{100000/end}")
+
+start = time.time()
+
+for batch in chunks(data2, batch_size):
+    result = conn.call('insert_batch_cache2', (batch,))
+
+conn.call('wait_completion')
+
+end = time.time() - start
+
+print(f"время вставки в cache2:{end}, скорость:{100000/end}")
