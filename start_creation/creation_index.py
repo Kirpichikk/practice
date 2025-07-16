@@ -38,12 +38,36 @@ def create_index_array(conn, name, part, space_name, parameter_unique):
                 type = 'tree',
                 parts={{
                     {{
-                        field = '{part}[*]',
+                        field = '{part}',
                         type = 'string',
+                        path = '[*]',
                         is_nullable = true 
                     }}
                 }},   
                 unique = {parameter_unique}
+            }})
+            return true
+        """)
+        return result.data[0]
+
+    except Exception as e:
+        print(f"ошибка создания индекса {e}")
+        return False
+
+def create_composite_index(conn, name, space_name):
+    try:
+        result = conn.eval(f"""
+        index = box.space.{space_name}:create_index('{name}', {{
+                parts={{
+                    {{'Session_Id'}},
+                    {{
+                        field = 'framed_ip_address',
+                        type = 'string',
+                        path = '[*]',
+                        is_nullable = true
+                    }}
+                }},
+                unique = false
             }})
             return true
         """)
@@ -65,3 +89,6 @@ for name in names:
         create_index_array(conn, name + "_index", name, "users", "false")
     else:
         create_index(conn, name+"_index",name, "users", "false")
+
+create_composite_index(conn, "session+ip_index","users")
+

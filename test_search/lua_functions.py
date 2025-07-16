@@ -58,7 +58,7 @@ conn.eval(f"""
             options = {{}}
         end
         
-        local iterator_val = options.iterator
+        local iterator_val = options.iterator or "EQ"
         local limit_val = options.limit or 100000
         local offset_val = options.offset
         local after_val = options.after
@@ -71,5 +71,38 @@ conn.eval(f"""
         data = index:select({{value}}, {{iterator = iterator_val, limit = limit_val, after = after_val, fetch_pos = fetch_pos_val, offset = offset_val}})
         
         return data
+    end
+""")
+
+conn.eval("""
+    function select_with_values(space_name, index_name, value1, value2, options)
+        options = options or {}
+
+        -- Получаем пространство и индекс
+        local space = box.space[space_name]
+        if not space then
+            error(string.format("Space '%s' not found", space_name))
+        end
+
+        local index = space.index[index_name]
+        if not index then
+            error(string.format("Index '%s' not found in space '%s'", index_name, space_name))
+        end
+
+        -- Формируем ключ поиска в зависимости от наличия второго значения
+        local search_key = {value1, value2}
+
+        -- Параметры запроса
+        local query_options = {
+            iterator = options.iterator,
+            limit = options.limit or 100000,
+            offset = options.offset,
+            after = options.after,
+            fetch_pos = options.fetch_pos,
+            partial = options.partial
+        }
+
+        -- Выполняем запрос
+        return index:select(search_key, query_options)
     end
 """)

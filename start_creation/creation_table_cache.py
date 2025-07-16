@@ -1,33 +1,41 @@
 from connection import Connection
-space_name = "users"
+space_name1 = "cache1"
+space_name2 = "cache2"
 conn = Connection()
 
 if conn:
     try:
-        if conn.eval(f"return box.space.{space_name} ~= nil").data[0]:
-            print(f"Пространство {space_name} уже существует")
+        if conn.eval(f"return box.space.{space_name1} ~= nil").data[0]:
+            print(f"Пространство {space_name1} уже существует")
         else:
             result = conn.eval(f"""
-               local space = box.schema.space.create('{space_name}', {{
+               local space = box.schema.space.create('{space_name1}', {{
                    if_not_exists = true,
                    format = {{
-                       {{name = 'key', type = 'unsigned'}},
+                       {{name = 'key', type = 'string'}},
                        {{name = 'value', type = 'string'}},
                    }}
                }})
                return true
            """)
 
-            print(f"Пространство {space_name} создано")
+            print(f"Пространство {space_name1} создано")
 
-            conn.eval(f"""
-                box.schema.sequence.create('key_seq', {{
-                     step = 1,
-                     if_not_exists = true
-                    }}
-                )
-                return true
-            """)
+        if conn.eval(f"return box.space.{space_name2} ~= nil").data[0]:
+            print(f"Пространство {space_name2} уже существует")
+        else:
+            result = conn.eval(f"""
+               local space = box.schema.space.create('{space_name2}', {{
+                   if_not_exists = true,
+                   format = {{
+                       {{name = 'key', type = 'string'}},
+                       {{name = 'value', type = 'string'}},
+                   }}
+               }})
+               return true
+           """)
+
+            print(f"Пространство {space_name2} создано")
 
     except Exception as e:
         print(f"Ошибка создания: {e}")
