@@ -30,10 +30,8 @@ def json_file_to_array(file_path):
 
 def get_data(data):
     match data['Code']:
-        case 263:
+        case 263 | 8:
             return data['Data']
-        case 8:
-            return tuple(data['Data'].split("."))
         case 443:
             match data['Data']['Subscription-Id-Type']['Data']:
                 case 0 | 1 | 2:

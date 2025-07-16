@@ -17,8 +17,8 @@ if conn:
                        {{name = 'IMSI', type = 'string', is_nullable = true}},
                        {{name = 'MSDN', type = 'string', is_nullable = true}},
                        {{name = 'NAI', type = 'string', is_nullable = true}},
-                       {{name = 'framed_ip_address', type = 'array', is_nullable = true}},
-                       {{name = 'framed_ipv6_prefix', type = 'array', is_nullable = true}},
+                       {{name = 'framed_ip_address', type = 'string', is_nullable = true}},
+                       {{name = 'framed_ipv6_prefix', type = 'string', is_nullable = true}},
                        {{name = 'called_station_id', type = 'string'}}
                    }}
                }})

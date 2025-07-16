@@ -60,12 +60,7 @@ def create_composite_index(conn, name, space_name):
         index = box.space.{space_name}:create_index('{name}', {{
                 parts={{
                     {{'Session_Id'}},
-                    {{
-                        field = 'framed_ip_address',
-                        type = 'string',
-                        path = '[*]',
-                        is_nullable = true
-                    }}
+                    {{'framed_ip_address'}}
                 }},
                 unique = false
             }})
@@ -85,10 +80,7 @@ names = [i['name'] for i in format_info[0][1:]]
 create_index_primary(conn, "primary","Id", "users", "true")
 
 for name in names:
-    if name in ["framed_ip_address", "framed_ipv6_prefix"]:
-        create_index_array(conn, name + "_index", name, "users", "false")
-    else:
-        create_index(conn, name+"_index",name, "users", "false")
+    create_index(conn, name+"_index",name, "users", "false")
 
 create_composite_index(conn, "session+ip_index","users")
 

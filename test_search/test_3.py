@@ -13,6 +13,6 @@ print(f'время выгрузки {value[0]} и "225": {end}')
 
 for i in value[1:]:
     start = time.time()
-    conn.call('select_with_values', ('users','session+ip_index',i,"225", {'iterator':'GE'}))
+    conn.call('select_with_values', ('users','session+ip_index',i,"225.38", {'iterator':'GE'}))
     end = time.time() - start
     print(f'время выгрузки {i} и "225": {end}')

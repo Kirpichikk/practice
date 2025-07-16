@@ -1,7 +1,3 @@
-"""
-нужно написать функцию поиска по составному запросу
-
-"""
 
 from connection import Connection
 
