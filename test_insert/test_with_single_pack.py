@@ -1,6 +1,6 @@
 import time
 from connection import Connection
-from creation_test_data import creation_data
+from creation_data.creation_test_data import creation_data
 
 conn = Connection()
 data = creation_data(True)

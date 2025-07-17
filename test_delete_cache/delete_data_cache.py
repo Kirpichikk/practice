@@ -1,4 +1,3 @@
-from connection import Connection
 
 def delete_data(conn, space_name, key):
     for i in key:
@@ -11,6 +10,3 @@ def delete_data(conn, space_name, key):
             return delete_result
         else:
             return "нет возможности удаления по данному ключу"
-
-conn = Connection()
-print(delete_data(conn,"cache1", "2"))

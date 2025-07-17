@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import time
-from creation_test_data import creation_data
+from creation_data.creation_test_data import creation_data
 from asynctnt import Connection
 
 # Настройка логирования

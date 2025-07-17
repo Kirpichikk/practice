@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import time
-from creation_test_data import creation_data
+from creation_data.creation_test_data_cache import creation_data
 from asynctnt import Connection
 
 # Настройка логирования
@@ -51,7 +51,7 @@ async def main_cache1():
     # Получаем тестовые данные
     try:
         # ИСПРАВЛЕНО: используем функцию создания тестовых данных
-        test_data = [(str(i), "3") for i in range(100000)]
+        test_data = creation_data(1)
         logger.info(f"Получено {len(test_data)} записей тестовых данных")
     except Exception as e:
         logger.error(f"Ошибка получения тестовых данных: {e}")
@@ -105,7 +105,7 @@ async def main_cache2():
     # Получаем тестовые данные
     try:
         # ИСПРАВЛЕНО: используем функцию создания тестовых данных
-        test_data = [(str(i), "\x00\xFF\xAA\xBB") for i in range(100000)]
+        test_data = creation_data(2)
         logger.info(f"Получено {len(test_data)} записей тестовых данных")
     except Exception as e:
         logger.error(f"Ошибка получения тестовых данных: {e}")

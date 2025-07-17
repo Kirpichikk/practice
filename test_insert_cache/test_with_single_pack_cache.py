@@ -1,9 +1,10 @@
 import time
 from connection import Connection
+from creation_data.creation_test_data_cache import creation_data
 
 conn = Connection()
-data1 = [(str(i), "3") for i in range(100000)]
-data2 = [(str(i), "\x00\xFF\xAA\xBB") for i in range(100000)]
+data1 = creation_data(1)
+data2 = creation_data(2)
 
 start = time.time()
 

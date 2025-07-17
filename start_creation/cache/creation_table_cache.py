@@ -29,7 +29,7 @@ if conn:
                    if_not_exists = true,
                    format = {{
                        {{name = 'key', type = 'string'}},
-                       {{name = 'value', type = 'string'}},
+                       {{name = 'value', type = 'varbinary'}},
                    }}
                }})
                return true
