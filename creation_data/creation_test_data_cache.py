@@ -65,5 +65,3 @@ def creation_data(cache):
 
     except Exception as e:
         print(f"Ошибка: {e}")
-
-print(creation_data(2)[0])

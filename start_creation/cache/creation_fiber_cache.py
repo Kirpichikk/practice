@@ -20,7 +20,7 @@ conn.eval("""
             end
             completed_batches = completed_batches + 1
             wait_channel:put(true)
-        end, batch)
+         end, batch)
         return "Insertion started"
     end
 
