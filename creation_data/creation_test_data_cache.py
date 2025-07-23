@@ -65,3 +65,8 @@ def creation_data(cache):
 
     except Exception as e:
         print(f"Ошибка: {e}")
+
+
+def creation_file(data):
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(data, f)
