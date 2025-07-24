@@ -5,6 +5,7 @@ import random
 def only_insert():
     data = creation_data(1)
     result = b''
+    count = 0
     for coder in data:
         key, value = coder
 
@@ -20,6 +21,8 @@ def only_insert():
 
 
         result += header1 + header2 + key_bytes + value_bytes
+        count += 1
+        print(count)
     return result
 
 def only_select():

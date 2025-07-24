@@ -80,8 +80,8 @@ def handle_message(flags, key, value, conn):
     """Обработка сообщения в зависимости от флагов"""
     if flags == FLAG_INSERT:
         print(f"[INSERT] Вставка данных: Ключ={key}, Значение={value}")
-        result = conn.insert('cache1', (key, value))
-        return result[0]
+        result = conn.upsert('cache1', (key, value),[('=', 1, value)])
+        return ["success"]
 
     elif flags == FLAG_QUERY:
         print(f"[QUERY] Поиск данных по ключу: {key}")
