@@ -29,5 +29,6 @@ for i in amount:
             update_value(conn,'cache2','3',b'\x00')
         else:
             update_value(conn, 'cache2', '3', b'\x01')
+        flag += 1
     end = time.time() - start
     print(f'время работы {i}: {end}')

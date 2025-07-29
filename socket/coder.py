@@ -5,7 +5,6 @@ import random
 def only_insert():
     data = creation_data(1)
     result = b''
-    count = 0
     for coder in data:
         key, value = coder
 
@@ -21,8 +20,7 @@ def only_insert():
 
 
         result += header1 + header2 + key_bytes + value_bytes
-        count += 1
-        print(count)
+
     return result
 
 def only_select():
@@ -94,9 +92,10 @@ def speed_test_data():
         value_bytes = value.encode()
 
         key_length = len(key_bytes)
+        key_length_with_flag = key_length | 0x80000000
         value_length = len(value_bytes)
 
-        header = struct.pack('>II', key_length, value_length)
+        header = struct.pack('>II', key_length_with_flag, value_length)
 
         result += header + key_bytes + value_bytes
 
@@ -109,8 +108,3 @@ def speed_test_data():
     result += header + key_bytes
 
     return result
-'''
-flag = (key_length_with_flag & 0x80000000) >> 31  # Считать старший бит (0 или 1)
-key_length = key_length_with_flag & 0x7FFFFFFF 
-
-'''
